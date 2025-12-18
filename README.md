@@ -27,7 +27,7 @@
 | :---: | :---: |
 | ![首页预览](https://github.com/user-attachments/assets/e77d1c10-aba4-4755-8a62-416fe3a8239e) | ![后台预览](https://github.com/user-attachments/assets/b2508b55-bbf6-4998-a111-a7b75eb8686b) |
 
-> 卡片的毛玻璃效果和程度可以在后台设置里自定义。
+> 卡片的毛玻璃效果和程度可以在后台设置里自定义。后台设置页面为url后加 /admin
 ## ✨ 核心特性
 
 - 📱 **响应式设计**：完美适配桌面、平板和手机等各种设备。
@@ -133,10 +133,9 @@
 > **注意**: 我使用免费的Gemini的api key，模型使用gemini-2.5-flash-lite,限制是15次/1分钟,自己看实际情况进行设置
 
 ### 管理后台安全
+> 后台管理页面地址为： https://自定义域名/admin
 
 后台登录凭据依然存放在 `NAV_AUTH` KV 中的 `admin_username` 与 `admin_password` 两个键内。登录 `/admin` 时需要在页面表单中输入账号与密码，系统会返回一个 12 小时有效的 HttpOnly 会话 Cookie，无需、也不再支持在 URL 查询参数中传递凭据。点击后台右上角的“退出登录”按钮即可立即销毁会话。
-
-## 更新日志
 
 ---
 
