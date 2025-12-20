@@ -1785,6 +1785,14 @@ const initSettings = () => {
   const wpSource360Btn = document.getElementById('wpSource360');
   const category360Select = document.getElementById('category360');
 
+  // Card Style Elements
+  const cardStyle1Container = document.getElementById('cardStyle1Container');
+  const cardStyle2Container = document.getElementById('cardStyle2Container');
+  const cardStyle1Check = document.getElementById('cardStyle1Check');
+  const cardStyle2Check = document.getElementById('cardStyle2Check');
+  const cardStyle1Preview = document.getElementById('cardStyle1Preview');
+  const cardStyle2Preview = document.getElementById('cardStyle2Preview');
+
   // Home Settings Inputs
   const hideTitleSwitch = document.getElementById('hideTitleSwitch');
   const homeTitleSizeInput = document.getElementById('homeTitleSize');
@@ -1807,6 +1815,54 @@ const initSettings = () => {
   const homeHitokotoColorPicker = document.getElementById('homeHitokotoColorPicker');
 
   const searchEngineSwitch = document.getElementById('searchEngineSwitch');
+
+  // Preview Logic
+  function updatePreviewCards() {
+      const hideDesc = hideDescSwitch.checked;
+      const hideLinks = hideLinksSwitch.checked;
+      const hideCategory = hideCategorySwitch.checked;
+
+      [cardStyle1Preview, cardStyle2Preview].forEach(card => {
+          if (!card) return;
+          const desc = card.querySelector('.preview-desc');
+          const links = card.querySelector('.preview-links');
+          const category = card.querySelector('.preview-category');
+
+          if (desc) desc.style.display = hideDesc ? 'none' : 'block';
+          if (links) links.style.display = hideLinks ? 'none' : 'flex'; // flex for layout
+          if (category) category.style.display = hideCategory ? 'none' : 'inline-flex';
+      });
+  }
+
+  // Card Style Selection Logic
+  function selectCardStyle(style) {
+      currentSettings.layout_card_style = style;
+      
+      // Update UI
+      if (style === 'style2') {
+          if (cardStyle2Check) cardStyle2Check.classList.remove('hidden');
+          if (cardStyle1Check) cardStyle1Check.classList.add('hidden');
+          if (cardStyle2Container) cardStyle2Container.classList.add('ring-2', 'ring-blue-500', 'rounded-xl');
+          if (cardStyle1Container) cardStyle1Container.classList.remove('ring-2', 'ring-blue-500', 'rounded-xl');
+      } else {
+          if (cardStyle1Check) cardStyle1Check.classList.remove('hidden');
+          if (cardStyle2Check) cardStyle2Check.classList.add('hidden');
+          if (cardStyle1Container) cardStyle1Container.classList.add('ring-2', 'ring-blue-500', 'rounded-xl');
+          if (cardStyle2Container) cardStyle2Container.classList.remove('ring-2', 'ring-blue-500', 'rounded-xl');
+      }
+  }
+
+  if (cardStyle1Container) {
+      cardStyle1Container.addEventListener('click', () => selectCardStyle('style1'));
+  }
+  if (cardStyle2Container) {
+      cardStyle2Container.addEventListener('click', () => selectCardStyle('style2'));
+  }
+
+  // Switch Listeners for Preview
+  if (hideDescSwitch) hideDescSwitch.addEventListener('change', updatePreviewCards);
+  if (hideLinksSwitch) hideLinksSwitch.addEventListener('change', updatePreviewCards);
+  if (hideCategorySwitch) hideCategorySwitch.addEventListener('change', updatePreviewCards);
 
   // AI Provider Elements
   const providerSelector = document.getElementById('providerSelector');
@@ -1858,7 +1914,8 @@ const initSettings = () => {
     layout_bg_blur_intensity: '0',
     bing_country: '',
     wallpaper_source: 'bing',
-    wallpaper_cid_360: '36'
+    wallpaper_cid_360: '36',
+    layout_card_style: 'style1'
   };
 
   let shouldStopBulkGeneration = false;
@@ -2284,6 +2341,8 @@ const initSettings = () => {
     
     currentSettings.layout_enable_frosted_glass = frostedGlassSwitch.checked;
     currentSettings.layout_frosted_glass_intensity = frostedGlassIntensityRange.value;
+    
+    // layout_card_style is already updated by click listeners
 
     saveSettings();
   });
@@ -2381,6 +2440,7 @@ const initSettings = () => {
             if (serverSettings.bing_country !== undefined) currentSettings.bing_country = serverSettings.bing_country;
             if (serverSettings.wallpaper_source) currentSettings.wallpaper_source = serverSettings.wallpaper_source;
             if (serverSettings.wallpaper_cid_360) currentSettings.wallpaper_cid_360 = serverSettings.wallpaper_cid_360;
+            if (serverSettings.layout_card_style) currentSettings.layout_card_style = serverSettings.layout_card_style;
 
         } else {
             // Fallback to localStorage if server has no data (migration)
@@ -2564,6 +2624,10 @@ const initSettings = () => {
             }
         }
     }
+
+    // Update Card Style UI
+    selectCardStyle(currentSettings.layout_card_style || 'style1');
+    updatePreviewCards();
   }
 
   // --- AI Call Logic (Frontend) ---
