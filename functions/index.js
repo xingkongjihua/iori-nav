@@ -425,6 +425,8 @@ export async function onRequest(context) {
     cardStyle: S.layout_card_style,
     enableFrostedGlass: S.layout_enable_frosted_glass,
     rememberLastCategory: S.home_remember_last_category,
+    // 当前 SSR 已渲染的分类（用于前端 Auto-restore 判断是否可跳过重绘）
+    ssrCatalogId: catalogExists ? categoryIdMap.get(requestedCatalogName) : 'all',
   }).replace(/</g, '\\u003c');
 
   // --- 一次性替换 </head> ---

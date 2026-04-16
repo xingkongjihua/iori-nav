@@ -68,7 +68,7 @@ export function renderSiteCards(sites, settings) {
       </span>`;
 
     return `
-      <div class="${baseCardClass} ${frostedClass} ${cardStyleClass} card-anim-enter" data-id="${site.id}" data-name="${safeName}" data-url="${safeUrl}" data-catalog="${safeCatalog}" data-desc="${safeDesc}">
+      <div class="${baseCardClass} ${frostedClass} ${cardStyleClass} card-anim-enter" data-id="${site.id}">
         <div class="site-card-content">
           <a href="${safeUrl || '#'}" ${hasValidUrl ? 'target="_blank" rel="noopener noreferrer"' : ''} class="block">
             <div class="flex items-start">

@@ -225,17 +225,21 @@ document.addEventListener('DOMContentLoaded', function () {
   // ========== 搜索功能 ==========
   const searchInputs = document.querySelectorAll('.search-input-target');
 
-  // 预缓存卡片搜索数据
+  // 预缓存卡片搜索数据：从 IORI_SITES 按 data-id 查表，避免把数据再塞进 card 的 data-* 属性
   let searchCardCache = null;
   function getSearchCardCache() {
     if (searchCardCache) return searchCardCache;
     const cards = sitesGrid?.querySelectorAll('.site-card');
     if (!cards) return [];
-    searchCardCache = Array.from(cards).map(card => ({
-      el: card,
-      text: [card.dataset.name, card.dataset.url, card.dataset.catalog, card.dataset.desc]
-        .map(s => (s || '').toLowerCase()).join('\0')
-    }));
+    const sitesById = new Map();
+    (window.IORI_SITES || []).forEach(s => sitesById.set(String(s.id), s));
+    searchCardCache = Array.from(cards).map(card => {
+      const id = card.getAttribute('data-id');
+      const s = sitesById.get(String(id)) || {};
+      const text = [s.name, s.url, s.catelog_name || '未分类', s.desc]
+        .map(v => (v || '').toLowerCase()).join('\0');
+      return { el: card, text };
+    });
     return searchCardCache;
   }
 
@@ -703,10 +707,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (delay > 0) card.style.removeProperty('animation-delay');
       }, { once: true });
 
-      card.setAttribute('data-name', safeName);
-      card.setAttribute('data-url', safeUrl);
-      card.setAttribute('data-catalog', safeCatalog);
-      card.setAttribute('data-desc', safeDesc);
+      card.setAttribute('data-id', site.id);
 
       card.innerHTML = `
         <div class="site-card-content">
@@ -854,6 +855,12 @@ document.addEventListener('DOMContentLoaded', function () {
       }
 
       if (lastId) {
+        // 若与 SSR 当前渲染的分类一致，无需重绘（避免进入首屏一闪的客户端重建）
+        // 同时跳过 updateHeading / updateNavigationState — SSR 已按该分类产出正确状态
+        if (String(lastId) === String(config.ssrCatalogId)) {
+          return;
+        }
+
         if (lastId === 'all') {
           // Explicitly restore "All Categories" state
           const allSites = window.IORI_SITES || [];
