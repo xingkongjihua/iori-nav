@@ -420,6 +420,13 @@ export async function onRequest(context) {
       }
     } catch { /* sanitizeUrl 已校验，这里不会触达 */ }
   }
+  // Logo 图标服务域名预连接（首屏 logo 多数来自 ICON_API 域，提前握手减少 LCP）
+  if (env.ICON_API) {
+    try {
+      const iconOrigin = new URL(env.ICON_API).origin;
+      headInjections += `<link rel="preconnect" href="${escapeHTML(iconOrigin)}" crossorigin>`;
+    } catch { /* ICON_API 格式异常时静默跳过 */ }
+  }
   if (fontLinksHtml) headInjections += fontLinksHtml;
 
   // 卡片自定义字体 CSS
